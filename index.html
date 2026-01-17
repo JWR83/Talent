@@ -23,6 +23,44 @@
       border-color: #0891b2;
       box-shadow: 0 20px 25px -5px rgba(8, 145, 178, 0.2), 0 10px 10px -5px rgba(8, 145, 178, 0.1);
     }
+    .tooltip-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    .tooltip-wrapper .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px 12px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+      line-height: 1.4;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .tooltip-wrapper .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1e293b transparent transparent transparent;
+    }
+    .tooltip-wrapper:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="bg-sky-50">
@@ -937,6 +975,17 @@
         return '#' + (index + 1);
       };
 
+      const getCriterionTooltip = (field) => {
+        const tooltips = {
+          engagement: 'Audience interaction rate: likes, comments, shares, and community involvement with content',
+          content_quality: 'Production quality, storytelling, editing, and overall polish of videos/content',
+          growth_potential: 'Trajectory and scalability: trend analysis, audience growth rate, and future opportunity',
+          production_value: 'Equipment, editing software, production team, and technical execution quality',
+          brand_fit: 'Alignment with brand values, target audience overlap, and partnership compatibility'
+        };
+        return tooltips[field] || '';
+      };
+
       if (loading) {
         return h('div', { className: 'min-h-screen p-4 md:p-6 flex items-center justify-center' },
           h('div', { className: 'text-xl text-gray-600' }, 'Loading talents from database...')
@@ -982,8 +1031,11 @@
               h('div', { className: 'grid grid-cols-2 md:grid-cols-5 gap-4' },
                 Object.keys(weights).map(key =>
                   h('div', { key: key },
-                    h('label', { className: 'text-sm text-cyan-50 capitalize block mb-1' },
-                      key.replace(/([A-Z])/g, ' $1').trim()
+                    h('div', { className: 'tooltip-wrapper' },
+                      h('label', { className: 'text-sm text-cyan-50 capitalize block mb-1' },
+                        key.replace(/([A-Z])/g, ' $1').trim()
+                      ),
+                      h('span', { className: 'tooltip-text' }, getCriterionTooltip(key))
                     ),
                     h('input', {
                       type: 'number',
@@ -1374,8 +1426,11 @@
                   ['engagement', 'content_quality', 'growth_potential', 'production_value', 'brand_fit'].map(field =>
                     h('div', { key: field },
                       h('div', { className: 'flex items-center justify-between mb-1' },
-                        h('label', { className: 'text-xs text-gray-600 capitalize font-semibold' },
-                          field.replace(/_/g, ' ')
+                        h('div', { className: 'tooltip-wrapper' },
+                          h('label', { className: 'text-xs text-gray-600 capitalize font-semibold' },
+                            field.replace(/_/g, ' ')
+                          ),
+                          h('span', { className: 'tooltip-text' }, getCriterionTooltip(field))
                         ),
                         h('span', { className: 'text-xs font-bold text-cyan-700' }, talent[field] + '/10')
                       ),
